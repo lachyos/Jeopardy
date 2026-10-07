@@ -1,1 +1,1 @@
-https://github.com/lachyos/Jeopardy
+https://lachyos.github.io/Jeopardy/
