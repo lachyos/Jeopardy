@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Jeopardy Night</title>
+<link href="https://fonts.googleapis.com/css2?family=Bungee&family=Fredoka:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#1a0b6e;--cell:#2b3cff;--gold:#ffd23f;--fg:#fff;--dim:#c3c9ff;--ok:#2ecc71;--bad:#ff4d5e;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1a0b6e}}
+:root[data-theme="dark"]{--bg:#1a0b6e}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;color:var(--fg);font-family:'Fredoka','Trebuchet MS',Arial,sans-serif;min-height:100vh;text-align:center;background:radial-gradient(circle at 20% 10%,#5b2bff66,transparent 45%),radial-gradient(circle at 80% 90%,#ff2bd666,transparent 45%),var(--bg);background-attachment:fixed}
+body::before{content:"";position:fixed;inset:0;background-image:radial-gradient(#fff7 1.5px,transparent 2px);background-size:60px 60px;animation:drift 40s linear infinite;pointer-events:none}
+@keyframes drift{to{background-position:60px 120px}}
+.wrap{max-width:1200px;margin:0 auto;padding:16px;position:relative}
+h1{font-family:'Bungee','Fredoka',Impact,sans-serif;font-weight:400;font-size:clamp(28px,6vw,64px);margin:.3em 0;background:linear-gradient(90deg,#ffd23f,#ff7a3f,#ff3fa4);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 4px 0 #0006);letter-spacing:2px}
+h2{margin:.4em 0}
+button,input{font:inherit;border-radius:14px;border:0;padding:14px 22px}
+button{background:linear-gradient(#ffe066,#ffb703);color:#2a1a00;font-weight:600;cursor:pointer;box-shadow:0 5px 0 #b37a00;transition:transform .1s}
+button:active{transform:translateY(4px);box-shadow:0 1px 0 #b37a00}
+button.sec{background:linear-gradient(#5566ff,#2b3cff);color:#fff;box-shadow:0 5px 0 #151f9e}
+button.ok{background:linear-gradient(#52e08a,#1fb95a);color:#fff;box-shadow:0 5px 0 #0f7a38}
+button.bad{background:linear-gradient(#ff7a86,#ff3b4e);color:#fff;box-shadow:0 5px 0 #a3202e}
+button:disabled{opacity:.4}
+input{background:#fff;color:#222;width:100%;margin:6px 0;text-align:center;font-size:1.2em;box-shadow:inset 0 3px 0 #0002}
+.row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:12px 0}
+.board{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:10px 0}
+.cat{background:linear-gradient(#ff7a3f,#ff3fa4);padding:14px 4px;border-radius:12px;font-weight:600;text-transform:uppercase;font-size:clamp(11px,1.8vw,22px);display:flex;align-items:center;justify-content:center;min-height:70px;box-shadow:0 5px 0 #8a1f63;text-shadow:0 2px 0 #0004}
+.tile{background:linear-gradient(#4a5bff,#2433d6);color:var(--gold);font-family:'Bungee','Fredoka',sans-serif;font-weight:400;font-size:clamp(20px,4vw,48px);padding:0;height:clamp(60px,12vh,120px);border-radius:14px;box-shadow:0 6px 0 #121a85;text-shadow:0 3px 0 #0005}
+.tile:hover{transform:scale(1.06) rotate(-1deg)}
+.tile.used{visibility:hidden}
+@keyframes pop{from{transform:scale(0) rotate(-10deg)}70%{transform:scale(1.1)}}
+.clue{background:linear-gradient(135deg,#3446ff,#6a2bd9);padding:30px;border-radius:24px;margin:14px 0;font-size:clamp(22px,4vw,48px);line-height:1.3;box-shadow:0 8px 0 #151f9e,0 0 40px #7d6bff88}
+@keyframes flip{from{transform:perspective(800px) rotateX(-90deg);opacity:0}}
+.pl{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:14px}
+.p{background:#0008;border:3px solid transparent;padding:10px 18px;border-radius:16px;min-width:110px}
+.p b{display:block;color:var(--gold);font-family:'Bungee',sans-serif;font-weight:400;font-size:1.5em}
+.code{font-family:'Bungee',sans-serif;font-size:clamp(40px,10vw,100px);letter-spacing:.2em;color:var(--gold);text-shadow:0 6px 0 #0006;animation:bob 2s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-8px)}}
+.buzz{width:min(75vw,300px);height:min(75vw,300px);border-radius:50%;font-family:'Bungee',sans-serif;font-size:2.2em;background:radial-gradient(circle at 35% 30%,#ff8a95,#ff2b40 60%,#b3001b);color:#fff;box-shadow:0 12px 0 #7a0012,0 0 50px #ff2b4088;margin:20px auto;display:block;animation:pulse 1.2s infinite}
+.buzz:active{transform:translateY(8px);box-shadow:0 4px 0 #7a0012}
+@keyframes pulse{50%{transform:scale(1.04)}}
+.dim{color:var(--dim)}
+.chip{display:inline-block;padding:4px 12px;border-radius:99px;color:#fff;font-weight:600;margin-left:6px}
+.sm{padding:8px 14px;font-size:.85em}
+.sub{font-size:1.6em;background:#0006;padding:14px;border-radius:14px}
+.tbar{height:18px;background:#0006;border-radius:99px;overflow:hidden;margin:10px auto;max-width:800px}
+.tbar i{display:block;height:100%;width:100%;background:linear-gradient(90deg,#52e08a,#ffe066);border-radius:99px}
+.tbar i.low{background:linear-gradient(90deg,#ff3b4e,#ff7a3f);animation:pulse .5s infinite}
+.tt{font-family:'Bungee',sans-serif;font-size:1.6em;color:var(--gold)}
+.toast{position:fixed;top:30%;left:50%;transform:translateX(-50%);font-family:'Bungee',sans-serif;font-size:clamp(26px,7vw,80px);padding:20px 40px;border-radius:24px;z-index:9;animation:toast 1.8s forwards;white-space:nowrap}
+.toast.ok{background:#1fb95a}.toast.bad{background:#ff3b4e}
+@keyframes toast{0%{transform:translateX(-50%) scale(0)}15%{transform:translateX(-50%) scale(1.15)}25%{transform:translateX(-50%) scale(1)}85%{opacity:1}100%{opacity:0;transform:translateX(-50%) translateY(-40px)}}
+.cf{position:fixed;top:-20px;width:12px;height:18px;z-index:8;animation:fall 2.6s ease-in forwards}
+@keyframes fall{to{transform:translate(var(--dx),110vh) rotate(720deg)}}
+.adj{display:flex;gap:8px;align-items:center;justify-content:space-between;border:3px solid;border-radius:14px;padding:8px 12px;margin:8px 0;background:#0005}
+.adj b{color:var(--gold);margin-left:6px}
+.ban{font-family:'Bungee',sans-serif;font-size:clamp(22px,4.5vw,56px);padding:16px 24px;border-radius:24px;margin:12px auto;max-width:1000px;color:#fff;background:linear-gradient(90deg,#ff3fa4,#ff7a3f,#ffd23f,#ff7a3f,#ff3fa4);background-size:300% 100%;animation:slide 3s linear infinite;box-shadow:0 8px 0 #0005;text-shadow:0 3px 0 #0006}
+.ban small{display:block;font-family:'Fredoka',sans-serif;font-size:.4em;opacity:.9;margin-top:4px}
+.ban.n{background:linear-gradient(90deg,var(--c),#ffffff55 50%,var(--c));background-size:300% 100%}
+.ban.b{animation:slide 2s linear infinite,pulse .8s infinite}
+.ban.g{background:linear-gradient(90deg,#1fb95a,#52e08a,#1fb95a);background-size:300% 100%}
+.ban.x{background:linear-gradient(90deg,#666,#999,#666);background-size:300% 100%}
+@keyframes slide{to{background-position:300% 0}}
+.spot{display:flex;align-items:center;justify-content:center;gap:24px;margin:16px auto;padding:18px 30px;border-radius:28px;max-width:800px;background:#0009;border:6px solid var(--c);animation:glow 1s ease-in-out infinite alternate}
+@keyframes glow{from{box-shadow:0 0 20px var(--c)}to{box-shadow:0 0 60px var(--c),0 0 0 4px var(--gold)}}
+.av{font-size:clamp(56px,10vw,120px);animation:bob 1s ease-in-out infinite}
+.who2{font-family:'Bungee',sans-serif;font-size:clamp(28px,6vw,72px);color:var(--gold);line-height:1}
+.of{font-size:clamp(16px,2.5vw,32px);color:var(--c);filter:brightness(1.7)}
+.bubble{font-size:clamp(24px,5vw,60px);background:#fff;color:#222;border-radius:30px;padding:18px 30px;max-width:900px;margin:14px auto}
+.ansbig{font-family:'Bungee',sans-serif;font-size:clamp(28px,6vw,72px);color:var(--gold);margin:12px;text-shadow:0 5px 0 #0006}
+.p.tm{--c:#fff;min-width:150px;border-color:var(--c);transition:transform .3s}
+.tm.act{transform:scale(1.12);animation:glow 1s ease-in-out infinite alternate}
+.tm.nxt{animation:bob 1.2s ease-in-out infinite;box-shadow:0 0 30px var(--c)}
+.tm.lk{opacity:.4;filter:grayscale(.7)}
+.tag{display:inline-block;font-family:'Bungee',sans-serif;font-size:.65em;padding:3px 10px;border-radius:99px;margin-bottom:6px;background:#555}
+.tag.a{background:var(--gold);color:#222}.tag.n{background:#fff;color:#222}
+.tn2{font-weight:600;font-size:1.2em}
+.mem{font-size:.8em;opacity:.9;margin-top:4px}.who{background:var(--gold);color:#222;border-radius:8px;padding:0 6px}
+.fl{position:fixed;bottom:-60px;opacity:.18;pointer-events:none;animation:up linear infinite}
+@keyframes up{to{transform:translateY(-120vh) rotate(360deg)}}
+canvas{filter:drop-shadow(0 10px 25px #0008)}
+.ban.pk{background:linear-gradient(90deg,#ffd23f,#ff9f1c,#ffd23f);background-size:300% 100%;color:#222;text-shadow:none;font-size:clamp(20px,6vw,30px);animation:slide 2s linear infinite,pulse .8s infinite}
+.ban.wait{background:#3d3d5c;animation:none;font-size:clamp(18px,5vw,26px)}
+.mb{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin:10px 0}
+.mc{font-size:10px;font-weight:600;text-transform:uppercase;background:linear-gradient(#ff7a3f,#ff3fa4);border-radius:8px;padding:6px 2px;display:flex;align-items:center;justify-content:center}
+.mt{padding:14px 0;font-family:'Bungee',sans-serif;font-weight:400;font-size:14px;color:var(--gold);background:linear-gradient(#4a5bff,#2433d6);box-shadow:0 4px 0 #121a85;border-radius:10px}
+.anim .tile,.anim .p{animation:pop .45s backwards}.anim .clue{animation:flip .6s}.anim .bubble{animation:pop .3s}
+</style></head><body><div class="wrap" id="app"></div>
+<script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
+<script>window.Peer||document.write('<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"><\/script>')</script>
+<script>
+const CATS=[
+["Science",[["This planet is known as the Red Planet","Mars"],["H2O is the chemical formula for this","Water"],["The powerhouse of the cell","Mitochondria"],["This force keeps planets in orbit around the Sun","Gravity"],["Element with atomic number 79","Gold"]]],
+["Geography",[["The longest river in Africa","The Nile"],["Capital of Australia","Canberra"],["The only continent with no permanent residents","Antarctica"],["Tallest mountain above sea level","Mount Everest"],["Country with the most time zones, counting territories","France"]]],
+["Movies",[["Clownfish dad searching for his son","Finding Nemo"],["1997 ship film: 'I'm the king of the world!'","Titanic"],["Wizard student with a lightning scar","Harry Potter"],["Director of Jaws and E.T.","Steven Spielberg"],["Tom Hanks: 'Life is like a box of chocolates'","Forrest Gump"]]],
+["Food",[["Italian dish with tomato sauce and mozzarella","Pizza"],["Japanese dish of vinegared rice and raw fish","Sushi"],["Main ingredient of guacamole","Avocado"],["World's most expensive spice by weight","Saffron"],["Korea's national dish of fermented cabbage","Kimchi"]]],
+["History",[["First U.S. president","George Washington"],["Year the Berlin Wall fell","1989"],["Ancient wonder in Egypt still standing","Great Pyramid of Giza"],["Queen of Egypt allied with Julius Caesar","Cleopatra"],["1919 treaty that ended World War I","Treaty of Versailles"]]]];
+const VAL=[200,400,600,800,1000];
+const TEAMS=[["Red","#e53935"],["Blue","#1e88e5"],["Green","#43a047"],["Purple","#8e24aa"],["Orange","#fb8c00"],["Teal","#00acc1"]];
+const A=i=>document.getElementById(i),app=A('app');
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const $$=v=>(v<0?'-':'')+'$'+Math.abs(v);
+let me;try{me=sessionStorage.getItem('jpid');if(!me){me='jp-'+Math.random().toString(36).slice(2,10);sessionStorage.setItem('jpid',me)}}catch(e){me='jp-'+Math.random().toString(36).slice(2,10)}
+let mode=null,S=null,hp=null,pc=null,pub=null,myName='',sent='',wr=0,prevS=null,wasPk=false;const conns={};
+
+function home(){
+  mode=null;const pre=(new URLSearchParams(location.search).get('c')||'').slice(0,4);
+  app.innerHTML=`<h1>JEOPARDY NIGHT</h1><p class="dim">Show the board on the TV. Everyone plays on their phone.</p>
+  <div class="row"><button id="h">📺 Host on TV</button></div><hr style="opacity:.2;margin:24px 0">
+  <div style="max-width:320px;margin:auto"><input id="c" placeholder="Room code" maxlength="4" value="${esc(pre)}">
+  <input id="n" placeholder="Your name" maxlength="12"><button id="j" style="width:100%">Join as player</button>
+  <p><button id="jd" class="sec sm">I'm the judge (host's phone)</button></p></div>`;
+  const code=()=>A('c').value.trim().toLowerCase();
+  A('h').onclick=host;
+  A('j').onclick=()=>{const n=A('n').value.trim();if(code().length==4&&n)play(code(),n,false)};
+  A('jd').onclick=()=>{if(code().length==4)play(code(),'Judge',true)};
+}
+/* ---------- HOST (TV) ---------- */
+function noPeer(){app.innerHTML='<h1>Can\'t connect 😕</h1><p>The multiplayer library didn\'t load. This game needs to be hosted on a normal website (like GitHub Pages) and will not work inside Claude\'s preview.</p><button onclick="location.reload()">Try again</button>'}
+function host(){if(typeof Peer==='undefined')return noPeer();mode='host';mk();setInterval(send,3000)}
+function mk(){
+  const code=Array.from({length:4},()=>'abcdefghjkmnpqrstuvwxyz'[Math.random()*23|0]).join('');
+  S={code,ph:'lobby',nt:2,players:{},teams:[],used:[],cur:null,who:null,txt:'',lock:[],picker:null,judge:null,lj:false,bt:20,td:0,tEnd:null,tn:TEAMS.map((t,i)=>'Team '+(i+1))};
+  const pr=new Peer('jpardy-'+code);hp=pr;
+  pr.on('error',e=>{if(e.type==='unavailable-id'){pr.destroy();mk()}else app.innerHTML='<h1>Connection error</h1><p>'+esc(e.type)+'</p>'});
+  pr.on('open',draw);
+  pr.on('connection',c=>{conns[c.peer]=c;c.on('data',d=>onMsg(c.peer,d));c.on('open',send);c.on('close',()=>{delete conns[c.peer];draw()})});
+}
+function smallest(){const n=S.teams.map(()=>0);Object.values(S.players).forEach(p=>{if(p.t!=null)n[p.t]++});return n.indexOf(Math.min(...n))}
+function onMsg(id,d){
+  if(!d||typeof d!=='object')return;
+  const P=S.players[id];
+  if(d.t==='join'&&d.n){if(!P)S.players[id]={n:String(d.n).slice(0,12),e:EM[Math.random()*EM.length|0],t:S.teams.length&&S.ph!=='spin'?smallest():null};send();draw()}
+  else if(d.t==='pick'){if(S.ph==='board'&&id===S.pk&&Number.isInteger(d.c)&&Number.isInteger(d.r)&&d.c>=0&&d.c<5&&d.r>=0&&d.r<5&&!S.used.includes(d.c*5+d.r))pick(d.c,d.r)}
+  else if(d.t==='tname'){if(S.ph!=='lobby'||!P||P.t==null||capOf(P.t)!==id)return;const v=String(d.x||'').trim().slice(0,14);if(!v)return;S.tn[P.t]=v;if(S.teams[P.t])S.teams[P.t].n=v;send();draw()}
+  else if(d.t==='judge'){S.judge=id;send();draw()}
+  else if(d.t==='buzz'){if(S.ph!=='buzz'||!P||P.t==null||S.lock.includes(P.t))return;S.who=id;S.ph='ans';S.txt='';setT(15);send();draw()}
+  else if(d.t==='answer'){if(S.ph!=='ans'||id!==S.who||S.txt)return;S.txt=String(d.x||'(no answer)').slice(0,80);S.tEnd=null;send();draw()}
+  else if(id===S.judge&&d.t==='adj')adj(d.i,d.v);
+  else if(id===S.judge&&['ok','no','skip','next'].includes(d.t))act(d.t);
+}
+function act(a){
+  if(!S.cur)return;const v=VAL[S.cur[1]],P=S.players[S.who];
+  if(a==='ok'&&S.ph==='ans'){S.teams[P.t].s+=v;S.picker=P.t;S.pk=S.who;S.ph='rev'}
+  else if(a==='no'&&S.ph==='ans'){S.teams[P.t].s-=v;S.lock.push(P.t);S.who=null;S.txt='';S.ph=S.teams.every((_,i)=>S.lock.includes(i))?'rev':'buzz'}
+  else if(a==='skip'&&S.ph==='buzz')S.ph='rev';
+  else if(a==='next'&&S.ph==='rev'){S.ph='board';S.cur=null}
+  else return;
+  if(S.ph==='buzz')setT(S.bt);else if(S.ph!=='ans')S.tEnd=null;
+  if(a==='ok'){S.res='🎉 '+P.n+' ('+S.teams[P.t].n+') got it! +$'+v;S.rok=1}else if(S.ph==='rev'){S.res='😬 Nobody got it!';S.rok=0}
+  if(a==='ok'){fx('🎉 CORRECT! +$'+v,'ok');confetti()}else if(a==='no')fx('✘ WRONG −$'+v,'bad');
+  send();draw();
+}
+function send(){
+  if(!hp)return;const c=S.cur?CATS[S.cur[0]]:null,cl=c?c[1][S.cur[1]]:null;
+  const d={ph:S.ph,players:S.players,teams:S.teams,who:S.who,lock:S.lock,txt:S.txt,picker:S.picker,clue:cl?cl[0]:'',cat:c?c[0]:'',val:cl?VAL[S.cur[1]]:0,ans:S.ph==='rev'&&cl?cl[1]:'',done:S.used.length>=25,pk:S.pk,used:S.used,caps:S.teams.map((_,i)=>capOf(i)||null),tl:S.tEnd?Math.max(0,S.tEnd-Date.now()):0,td:S.td};
+  Object.values(conns).forEach(k=>{if(k.open)k.send(k.peer===S.judge?Object.assign({},d,{judge:1,ja:cl?cl[1]:''}):d)});
+}
+
+const EM=['🦊','🐼','🐸','🦄','🐙','🐯','🦁','🐵','🐧','🐲','🦖','🐝','🐨','🦉'];
+const TH='<div class="tbar"><i id="tb"></i></div><div id="tt" class="tt"></div>';
+function capOf(i){return Object.keys(S.players).find(id=>S.players[id].t===i&&!S.players[id].bot)}
+function setT(n){S.tEnd=Date.now()+n*1000;S.td=n}
+function adj(i,v){if(S.teams[i]&&Math.abs(v)===100){S.teams[i].s+=v;send();draw()}}
+function fx(t,k){const e=document.createElement('div');e.className='toast '+k;e.textContent=t;document.body.appendChild(e);setTimeout(()=>e.remove(),1800)}
+function confetti(){for(let i=0;i<70;i++){const e=document.createElement('i');e.className='cf';e.style.cssText=`left:${Math.random()*100}vw;background:hsl(${Math.random()*360},90%,60%);animation-delay:${Math.random()*.6}s;--dx:${(Math.random()-.5)*200}px`;document.body.appendChild(e);setTimeout(()=>e.remove(),3300)}}
+function tick(){
+  let end=0,td=0;
+  if(mode==='host'&&S&&S.tEnd){end=S.tEnd;td=S.td;
+    if(Date.now()>=S.tEnd){S.tEnd=null;if(S.ph==='buzz'){fx("⏰ Time's up!",'bad');act('skip')}else if(S.ph==='ans')act('no');return}}
+  else if((mode==='player'||mode==='judge')&&pub&&pub.tl){end=pub.rcv+pub.tl;td=pub.td}
+  const b=A('tb');if(!b||!end)return;const r=Math.max(0,end-Date.now());
+  b.style.width=(r/(td*1000)*100)+'%';b.className=r<5000?'low':'';A('tt').textContent=Math.ceil(r/1000);
+}
+const BN=["Botty","Robo","Beep","Boop","Chip","Sparky","Gizmo","Byte"];
+function addBot(){
+  const used=Object.values(S.players).map(p=>p.n),n=BN.find(b=>!used.includes(b))||('Bot'+Object.keys(S.players).length);
+  S.players['bot-'+Math.random().toString(36).slice(2,8)]={n:n,e:'🤖',bot:1,t:S.teams.length?smallest():null};send();draw();
+}
+function botsAct(){
+  S.bk=S.bk||{};const L=S.used.length+'-'+S.lock.length;
+  if(S.ph==='board'&&S.players[S.pk]&&S.players[S.pk].bot&&S.used.length<25){const k='p'+S.used.length;if(!S.bk[k]){S.bk[k]=1;setTimeout(()=>{if(S.ph!=='board')return;const fr=[];for(let i=0;i<25;i++)if(!S.used.includes(i))fr.push(i);if(fr.length){const f=fr[Math.random()*fr.length|0];pick(f/5|0,f%5)}},1800)}}
+  if(S.ph==='buzz'){
+    Object.keys(S.players).forEach(id=>{const p=S.players[id],k='b'+L+id;
+      if(!p.bot||S.bk[k]||p.t==null||S.lock.includes(p.t))return;S.bk[k]=1;
+      if(Math.random()<.7)setTimeout(()=>{if(S.ph==='buzz')onMsg(id,{t:'buzz'})},1000+Math.random()*3500)});
+  } else if(S.ph==='ans'&&S.players[S.who]&&S.players[S.who].bot){
+    const id=S.who,k='a'+L+id;if(S.bk[k])return;S.bk[k]=1;
+    setTimeout(()=>{if(S.ph==='ans'&&S.who===id&&!S.txt)onMsg(id,{t:'answer',x:Math.random()<.5?CATS[S.cur[0]][1][S.cur[1]][1]:'Not sure, a guess'})},1500+Math.random()*2000);
+  }
+}
+function pick(c,r){if(S.ph!=='board')return;S.cur=[c,r];S.used.push(c*5+r);S.lock=[];S.who=null;S.txt='';S.ph='buzz';setT(S.bt);send();draw()}
+function roster(){
+  const ps=Object.values(S.players);
+  if(!S.teams.length)return '<div class="pl">'+(ps.map(p=>`<div class="p">${p.e||''} ${esc(p.n)}</div>`).join('')||'<p class="dim">Waiting for players…</p>')+'</div>';
+  return '<div class="pl">'+S.teams.map((t,i)=>`<div class="p" style="border-color:${t.c};background:${t.c}33"><b style="color:#fff">${esc(t.n)}</b>${ps.filter(p=>p.t===i).map(p=>(S.players[capOf(i)]===p?'👑':'')+(p.e||'')+' '+esc(p.n)).join('<br>')||'—'}</div>`).join('')+'</div>';
+}
+function scores(sel){
+  const ap=S.ph==='ans'&&S.players[S.who]?S.players[S.who].t:null,ps=Object.values(S.players),inClue=S.cur&&(S.ph==='buzz'||S.ph==='ans');
+  return '<div class="pl">'+S.teams.map((t,i)=>{
+    const act=i===ap,nx=S.ph==='board'&&i===S.picker,lk=inClue&&S.lock.includes(i);
+    const tag=act?'<div class="tag a">🎤 ANSWERING</div>':nx?'<div class="tag n">👉 UP NEXT</div>':lk?'<div class="tag">🔒 LOCKED OUT</div>':'';
+    const mem=ps.filter(p=>p.t===i).map(p=>`<span class="${(act&&S.players[S.who]===p)||(nx&&S.players[S.pk]===p)?'who':''}">${p.e||''} ${esc(p.n)}</span>`).join(' ');
+    return `<div class="p tm ${act?'act':''} ${nx?'nxt':''} ${lk?'lk':''}" style="--c:${t.c}">${tag}<div class="tn2">${esc(t.n)}</div><b>${$$(t.s)}</b><div class="mem">${mem}</div>${S.lj?`<button class="bad sm" data-adj="${i}:-100">−100</button> <button class="ok sm" data-adj="${i}:100">+100</button>`:''}</div>`}).join('')+'</div>';
+}
+function banner(){const p=S.players[S.pk],t=S.teams[S.picker];return t?`<div class="ban n" style="--c:${t.c}">${p?(p.e||'')+' '+esc(p.n):esc(t.n)} — you're up!<small>${esc(t.n)} · picking a clue on their phone</small></div>`:''}
+function floaters(){['❓','⭐','💡','🎯','🏆','✨','🎉','🧠'].forEach((e,i)=>{const s=document.createElement('span');s.className='fl';s.textContent=e;s.style.cssText=`left:${5+i*12}vw;font-size:${28+Math.random()*40}px;animation-duration:${18+Math.random()*14}s;animation-delay:${-Math.random()*20}s`;document.body.appendChild(s)})}
+function jl(){return S.lj?'<p class="dim">Judging on this screen (answer shows after a player submits)</p>':(S.judge&&conns[S.judge]&&conns[S.judge].open?'<p class="dim">🧑‍⚖️ Judge phone connected</p>':'<p class="dim">No judge phone yet. <button class="sec sm" id="lj">Judge on this screen instead</button></p>')}
+const PAL=['#ff3fa4','#2b8cff','#2ecc71','#ff9f1c','#9b5de5','#00bbf9','#f15bb5','#e6c200','#00c9a7','#ff595e'];
+async function spin(){
+  S.teams=TEAMS.slice(0,S.nt).map(([n,c],i)=>({n:S.tn[i],c,s:0}));
+  const ids=Object.keys(S.players);ids.forEach(i=>S.players[i].t=null);S.ph='spin';send();
+  let pool=ids.slice();const n=ids.length,base=Math.floor(n/S.nt),extra=n%S.nt;
+  for(let t=0;t<S.nt;t++){
+    const q=base+(t<extra?1:0);
+    for(let k=0;k<q;k++){
+      const w=Math.random()*pool.length|0,id=pool[w];
+      const head=`Spinning for <span style="color:${S.teams[t].c}">${esc(S.teams[t].n)}</span> <small>(${k+1} of ${q})</small>`;
+      await wheel(pool.map(i=>(S.players[i].e||'')+' '+S.players[i].n),w,head,t);
+      S.players[id].t=t;pool.splice(w,1);send();
+    }
+  }
+  S.ph='lobby';send();draw();
+}
+function wheel(labels,w,head,t){
+  app.innerHTML=`<h2 id="sn" style="font-family:'Bungee',sans-serif">${head}</h2><canvas id="wc" width="460" height="460" style="max-width:80vw;max-height:52vh"></canvas>${roster()}`;
+  const x=A('wc').getContext('2d'),n=labels.length,a=2*Math.PI/n,P=Math.PI,fs=n>8?14:n>5?18:22;
+  const paint=R=>{x.clearRect(0,0,460,460);x.save();x.translate(230,240);
+    labels.forEach((l,i)=>{x.beginPath();x.moveTo(0,0);x.arc(0,0,190,-P/2+i*a+R,-P/2+(i+1)*a+R);x.fillStyle=PAL[i%PAL.length];x.fill();x.strokeStyle='#fff';x.lineWidth=3;x.stroke();
+      x.save();x.rotate(-P/2+(i+.5)*a+R);x.fillStyle='#fff';x.font=`bold ${fs}px 'Fredoka',Arial`;x.textAlign='right';x.fillText(l.slice(0,12),178,fs/3);x.restore()});
+    x.restore();x.fillStyle='#ffcc00';x.beginPath();x.moveTo(230,56);x.lineTo(214,8);x.lineTo(246,8);x.fill()};
+  const from=wr,tg=((2*P-(w+.5)*a+(Math.random()-.5)*a*.6)%(2*P)+2*P)%(2*P),to=from-(from%(2*P))+8*P+tg;
+  return new Promise(res=>{const t0=performance.now(),D=3000;
+    const f=now=>{const p=Math.min(1,(now-t0)/D),e=1-Math.pow(1-p,3);wr=from+(to-from)*e;paint(wr);
+      if(p<1)requestAnimationFrame(f);else{A('sn').textContent=labels[w].trim()+' → '+S.teams[t].n+'!';setTimeout(res,1100)}};
+    requestAnimationFrame(f)});
+}
+function draw(){
+  if(mode!=='host'||S.ph==='spin')return;
+  const ids=Object.keys(S.players),assigned=S.teams.length&&ids.every(i=>S.players[i].t!=null);
+  if(S.ph==='lobby'){
+    if(document.activeElement&&document.activeElement.classList.contains('tn'))return;
+    app.innerHTML=`<h1>JEOPARDY NIGHT</h1><p class="dim">Open <b>${esc(location.href.split('?')[0])}</b> and enter code</p><div class="code">${S.code.toUpperCase()}</div>${roster()}
+    <div class="row">${[2,3,4,5,6].map(n=>`<button class="nt ${S.nt==n?'':'sec'}" data-n="${n}">${n} teams</button>`).join('')}</div>
+    ${assigned?'<p class="dim">👑 Captains can rename their team from their phone</p>':''}    <div class="row dim">⏱ Buzz time ${[15,20,30].map(n=>`<button class="bt sm ${S.bt==n?'':'sec'}" data-n="${n}">${n}s</button>`).join('')}</div>
+    <div class="row"><button class="sec" id="ab">🤖 Add bot</button>${ids.some(i=>S.players[i].bot)?'<button class="sec" id="rb">Remove bots</button>':''}</div>
+    <div class="row"><button id="sp" ${ids.length>=S.nt?'':'disabled'}>🎡 Spin the wheel</button>${assigned?'<button class="ok" id="go">Start game</button>':''}</div>${jl()}`;
+    app.querySelectorAll('.nt').forEach(b=>b.onclick=()=>{S.nt=+b.dataset.n;S.teams=[];ids.forEach(i=>S.players[i].t=null);send();draw()});
+    A('sp').onclick=spin;app.querySelectorAll('.bt').forEach(b=>b.onclick=()=>{S.bt=+b.dataset.n;draw()});A('ab').onclick=addBot;if(A('rb'))A('rb').onclick=()=>{ids.forEach(i=>{if(S.players[i].bot)delete S.players[i]});send();draw()};if(A('go'))A('go').onclick=()=>{S.ph='board';if(S.pk==null||!S.players[S.pk]){const ks=Object.keys(S.players);S.pk=ks[Math.random()*ks.length|0];S.picker=S.players[S.pk].t}send();draw()};
+  } else if(S.ph==='board'){
+    const over=S.used.length>=25,top=S.teams.reduce((m,t)=>t.s>m.s?t:m,S.teams[0]);if(over&&!S.cf){S.cf=1;confetti()}
+    let t=CATS.map(c=>`<div class="cat">${esc(c[0])}</div>`).join('');
+    for(let r=0;r<5;r++)for(let c=0;c<5;c++)t+=`<button class="tile ${S.used.includes(c*5+r)?'used':''}" data-c="${c}" data-r="${r}">$${VAL[r]}</button>`;
+    app.innerHTML=`${over?'':banner()}<div class="board">${t}</div>${over?`<h1>🏆 ${esc(top.n)} wins!</h1>`:''}${scores(S.picker)}${jl()}`;
+    app.querySelectorAll('.tile').forEach(b=>b.onclick=()=>pick(+b.dataset.c,+b.dataset.r));
+  } else {
+    const c=CATS[S.cur[0]],cl=c[1][S.cur[1]],pl=S.players[S.who],tm=pl&&S.teams[pl.t];let b='';
+    if(S.ph==='buzz')b='<div class="ban b">🔔 BUZZ IN NOW!<small>tap the big red button on your phone</small></div>'+(S.lj?`<div class="row"><button class="sec" id="sk">Skip</button></div>`:'');
+    if(S.ph==='ans')b=`<div class="spot" style="--c:${tm.c}"><div class="av">${pl.e||'🙋'}</div><div><div class="who2">${esc(pl.n)}</div><div class="of">${esc(tm.n)} is answering…</div></div></div><div class="bubble">${S.txt?'“'+esc(S.txt)+'”':'<span class="dim">✍️ typing…</span>'}</div>`+(S.lj?`${S.txt?`<p class="dim">Answer: ${esc(cl[1])}</p>`:'<p class="dim">Answer shows once they submit…</p>'}<div class="row"><button class="ok" id="ok">✔ Correct</button><button class="bad" id="no">✘ Wrong</button></div>`:'<p class="dim">Waiting for the judge…</p>');
+    if(S.ph==='rev')b=`<div class="ban ${S.rok?'g':'x'}">${esc(S.res||'')}</div><div class="ansbig">✅ ${esc(cl[1])}</div><div class="row"><button id="nx">Back to board</button></div>`;
+    app.innerHTML=`<p class="dim" style="text-transform:uppercase">${esc(c[0])} — $${VAL[S.cur[1]]}</p><div class="clue">${esc(cl[0])}</div>${S.tEnd?TH:''}${b}${scores(tm?S.players[S.who].t:null)}${S.ph==='buzz'||S.ph==='ans'?jl():''}`;
+    [['sk','skip'],['ok','ok'],['no','no'],['nx','next']].forEach(([i,a])=>{if(A(i))A(i).onclick=()=>act(a)});
+  }
+  if(A('lj'))A('lj').onclick=()=>{S.lj=true;draw()};
+  app.querySelectorAll('[data-adj]').forEach(b=>b.onclick=()=>{const[i,v]=b.dataset.adj.split(':');adj(+i,+v)});
+  botsAct();
+}
+/* ---------- PLAYER / JUDGE (phones) ---------- */
+function tx(t,d){if(pc&&pc.open)pc.send(Object.assign({t},d))}
+function play(code,name,isJ){
+  if(typeof Peer==='undefined')return noPeer();
+  mode=isJ?'judge':'player';myName=name;app.innerHTML='<h1>Connecting…</h1>';
+  const pr=new Peer(me);
+  const link=()=>{pc=pr.connect('jpardy-'+code,{reliable:true});
+    pc.on('open',()=>tx(isJ?'judge':'join',{n:myName}));
+    pc.on('data',d=>{if(d&&d.ph){pub=d;pub.rcv=Date.now();render()}});
+    pc.on('close',()=>setTimeout(link,2000))};
+  pr.on('open',link);
+  pr.on('error',e=>{if(e.type==='peer-unavailable')app.innerHTML='<h1>Room not found</h1><p class="dim">Check the code.</p><button onclick="location.reload()">Back</button>'});
+  setInterval(()=>{if(!pc||!pc.open)return;if(isJ?!(pub&&pub.judge):!(pub&&pub.players&&pub.players[me]))tx(isJ?'judge':'join',{n:myName})},2500);
+  render();
+}
+function render(){
+  if(mode==='judge')return renderJudge();
+  if(mode!=='player')return;
+  if(!pub||!pub.players||!pub.players[me]){app.innerHTML=`<h1>Hi ${esc(myName)}!</h1><p class="dim">Looking for the game…</p>`;return}
+  if(A('tnm')&&document.activeElement===A('tnm'))return;
+  if(pub.ph!=='ans'||pub.who!==me)sent='';
+  if(pub.ph!=='board')wasPk=false;
+  const mp=pub.players[me],tm=mp.t!=null?pub.teams[mp.t]:null;
+  if(tm){if(prevS!==null&&tm.s>prevS){confetti();if(navigator.vibrate)navigator.vibrate([80,40,80])}prevS=tm.s}
+  const isCap=!!(pub.caps&&mp.t!=null&&pub.caps[mp.t]===me),cp=pub.caps&&mp.t!=null&&pub.players[pub.caps[mp.t]],capName=cp?(cp.e||'')+' '+esc(cp.n):'Someone';
+  const bar=`<p class="dim">${mp.e||''} ${esc(mp.n)} ${tm?`<span class="chip" style="background:${tm.c}">${esc(tm.n)} · ${$$(tm.s)}</span>`:''}</p>`;
+  let b='';
+  if(pub.ph==='lobby')b=tm?`<h2>You're on <span style="color:${tm.c}">${esc(tm.n)}</span>! 🎉</h2>`+(isCap?`<p>👑 You're the captain — name your team!</p><input id="tnm" maxlength="14" value="${esc(tm.n)}"><button id="tns" style="width:100%">Save team name</button>`:`<p class="dim">${capName} is captain and picks the team name</p>`)+'<p class="dim">Waiting for the host to start…</p>':'<h2>You\'re in! 🎉</h2><p class="dim">Waiting for the team wheel…</p>';
+  else if(pub.ph==='spin')b='<h2>🎡 Spinning the wheel…</h2>'+(tm?`<p>You\'re on <span style="color:${tm.c}">${esc(tm.n)}</span>!</p>`:'<p class="dim">Watch the TV — your name is on the wheel!</p>');
+  else if(pub.ph==='board'){
+    if(pub.done)b='<h2>Game over! 🏆</h2>';
+    else if(pub.pk===me){
+      if(!wasPk&&navigator.vibrate)navigator.vibrate([120,60,120]);wasPk=true;
+      b='<div class="ban pk">🎯 IT\'S YOUR PICK!<small>choose a clue below</small></div><div class="mb">'+CATS.map(c=>`<div class="mc">${esc(c[0])}</div>`).join('')+VAL.map((v,r)=>CATS.map((_,c)=>`<button class="mt" data-c="${c}" data-r="${r}" ${pub.used.includes(c*5+r)?'disabled style="visibility:hidden"':''}>${v}</button>`).join('')).join('')+'</div>';
+    } else {
+      wasPk=false;const pk=pub.players[pub.pk],pt=pk&&pk.t!=null?pub.teams[pk.t]:null;
+      b=`<div class="ban wait">⏳ Not your pick</div><h2>${pk?(pk.e||'')+' '+esc(pk.n):'Someone'} is choosing the clue</h2>`+(pk&&pk.t===mp.t?'<p>Your teammate is picking — shout out ideas! 🗣️</p>':pt?`<p class="dim">${esc(pt.n)} is up</p>`:'');
+    }
+  }
+  else if(pub.ph==='buzz'){
+    if(mp.t==null)b='<h2>Waiting for a team…</h2>';
+    else if(pub.lock.includes(mp.t))b='<h2>Your team is locked out 😬</h2><p class="dim">Others can still steal!</p>';
+    else b=`<p class="dim">${esc(pub.cat)} · $${pub.val}</p><p style="font-size:1.2em">${esc(pub.clue)}</p>${pub.tl?TH:''}<button class="buzz" id="bz">BUZZ!</button>`;
+  } else if(pub.ph==='ans'){
+    const txt=pub.txt||sent;
+    if(pub.who===me&&txt)b=`<h2>Answer submitted ✔</h2><p class="sub">“${esc(txt)}”</p><p class="dim">Locked in — waiting for the judge…</p>`;
+    else if(pub.who===me)b=`<h2>You buzzed in! ✋</h2>${pub.tl?TH:''}<input id="at" placeholder="Type your answer" autocomplete="off"><button id="as" style="width:100%">Submit</button>`;
+    else{const w=pub.players[pub.who];b=`<h2>${esc(w?w.n:'Someone')} buzzed in</h2><p class="dim">Waiting for their answer…</p>`}
+  } else if(pub.ph==='rev')b=`<h2>Answer</h2><p style="font-size:1.6em;color:var(--gold)">${esc(pub.ans)}</p>`;
+  const keep=A('at')&&A('at').value;
+  app.innerHTML=bar+b;
+  if(A('bz'))A('bz').onclick=()=>{tx('buzz',{});if(navigator.vibrate)navigator.vibrate(60);A('bz').disabled=true;A('bz').textContent='…'};
+  if(A('tns')){const ti=A('tnm'),sv=()=>{const v=ti.value.trim();if(!v)return;tx('tname',{x:v});A('tns').textContent='Saved ✔'};A('tns').onclick=sv;ti.onkeydown=e=>{if(e.key==='Enter')sv()}}
+  app.querySelectorAll('.mt').forEach(x=>x.onclick=()=>{tx('pick',{c:+x.dataset.c,r:+x.dataset.r});x.disabled=true});
+  const at=A('at');
+  if(at){if(keep)at.value=keep;at.focus();
+    const go=()=>{const v=at.value.trim();if(!v)return;sent=v;tx('answer',{x:v});render()};
+    A('as').onclick=go;at.onkeydown=e=>{if(e.key==='Enter')go()}}
+}
+function renderJudge(){
+  if(!pub||!pub.judge){app.innerHTML='<h1>🧑‍⚖️ Judge</h1><p class="dim">Connecting…</p>';return}
+  const w=pub.players[pub.who],tm=w&&pub.teams[w.t];let b='';
+  if(pub.ph==='lobby'||pub.ph==='spin')b='<p class="dim">Waiting for the game to start…</p>';
+  else if(pub.ph==='board')b='<p class="dim">Waiting for a clue to be picked on the TV…</p>';
+  else{
+    b=`<p class="dim">${esc(pub.cat)} · $${pub.val}</p><p style="font-size:1.2em">${esc(pub.clue)}</p>${pub.tl?TH:''}<p class="sub" style="color:var(--gold)">Answer: ${esc(pub.ja)}</p>`;
+    if(pub.ph==='buzz')b+='<p class="dim">Buzzers open…</p><button class="sec" id="jsk" style="width:100%">Skip clue</button>';
+    if(pub.ph==='ans')b+=`<h3>${esc(w.n)} (${esc(tm.n)})</h3><p class="sub">${pub.txt?'“'+esc(pub.txt)+'”':'<span class="dim">typing…</span>'}</p><div class="row"><button class="ok" id="jok">✔ Correct</button><button class="bad" id="jno">✘ Wrong</button></div>`;
+    if(pub.ph==='rev')b+='<button id="jnx" style="width:100%">Back to board</button>';
+  }
+  const adjH=pub.teams.length?'<h3>Adjust scores</h3>'+pub.teams.map((t,i)=>`<div class="adj" style="border-color:${t.c}"><span>${esc(t.n)} <b>${$$(t.s)}</b></span><span><button class="bad sm" data-i="${i}" data-v="-100">−100</button> <button class="ok sm" data-i="${i}" data-v="100">+100</button></span></div>`).join(''):'';
+  app.innerHTML='<h2>🧑‍⚖️ Judge screen</h2>'+b+adjH;
+  app.querySelectorAll('.adj button').forEach(x=>x.onclick=()=>tx('adj',{i:+x.dataset.i,v:+x.dataset.v}));
+  [['jsk','skip'],['jok','ok'],['jno','no'],['jnx','next']].forEach(([i,a])=>{if(A(i))A(i).onclick=()=>tx(a)});
+}
+let lk='';
+new MutationObserver(()=>{const o=mode==='host'?S:pub,k=mode+'|'+(o?o.ph+':'+(o.used?o.used.length:0)+':'+(o.lock?o.lock.length:0)+':'+(o.who||''):'');
+  if(k!==lk){lk=k;app.classList.add('anim');setTimeout(()=>app.classList.remove('anim'),900)}tick()}).observe(app,{childList:true});
+setInterval(tick,200);
+floaters();
+home();
+</script></body></html>
