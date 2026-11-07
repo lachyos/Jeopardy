@@ -124,7 +124,7 @@ function host(){if(typeof Peer==='undefined')return noPeer();mode='host';mk();se
 function mk(){
   const code=Array.from({length:4},()=>'abcdefghjkmnpqrstuvwxyz'[Math.random()*23|0]).join('');
   S={code,ph:'lobby',nt:2,players:{},teams:[],used:[],cur:null,who:null,txt:'',lock:[],picker:null,judge:null,lj:false,round:0,pfu:[],paused:false,cs:0,bt:20,td:0,tEnd:null,tn:TEAMS.map((t,i)=>'Team '+(i+1))};
-  const pr=new Peer('jpardy-'+code);hp=pr;
+  const pr=new Peer('jpardy-'+code,{config:ICE});hp=pr;
   pr.on('error',e=>{if(e.type==='unavailable-id'){pr.destroy();mk()}else app.innerHTML='<h1>Connection error</h1><p>'+esc(e.type)+'</p>'});
   pr.on('open',draw);
   pr.on('connection',c=>{conns[c.peer]=c;c.on('data',d=>onMsg(c.peer,d));c.on('open',send);c.on('close',()=>{delete conns[c.peer];draw()})});
@@ -290,19 +290,34 @@ function draw(){
 }
 /* ---------- PLAYER / JUDGE (phones) ---------- */
 function tx(t,d){if(pc&&pc.open)pc.send(Object.assign({t},d))}
+const ICE={iceServers:[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'},{urls:'stun:stun.cloudflare.com:3478'},{urls:['turn:openrelay.metered.ca:80','turn:openrelay.metered.ca:443','turn:openrelay.metered.ca:443?transport=tcp'],username:'openrelayproject',credential:'openrelayproject'}]};
 function play(code,name,isJ){
   if(typeof Peer==='undefined')return noPeer();
-  mode=isJ?'judge':'player';myName=name;app.innerHTML='<h1>Connecting…</h1>';
-  const pr=new Peer(me);
-  const link=()=>{pc=pr.connect('jpardy-'+code,{reliable:true});
-    pc.on('open',()=>tx(isJ?'judge':'join',{n:myName}));
-    pc.on('data',d=>{if(d&&d.ph){pub=d;pub.rcv=Date.now();render()}});
-    pc.on('close',()=>setTimeout(link,2000))};
-  pr.on('open',link);
-  pr.on('disconnected',()=>{try{pr.reconnect()}catch(e){}});
-  pr.on('error',e=>{if(e.type==='peer-unavailable')app.innerHTML='<h1>Room not found</h1><p class="dim">Check the code.</p><button onclick="location.reload()">Back</button>'});
-  setInterval(()=>{if(!pc||!pc.open)return;if(isJ?!(pub&&pub.judge):!(pub&&pub.players&&pub.players[me]))tx(isJ?'judge':'join',{n:myName})},2500);
-  render();
+  mode=isJ?'judge':'player';myName=name;
+  app.innerHTML='<h1>Connecting…</h1><p class="dim" id="cst">Contacting the room…</p>';
+  const st=t=>{const e=A('cst');if(e)e.textContent=t};
+  let pr=null,tries=0,n=0;
+  const start=()=>{
+    pr=new Peer(me,{config:ICE});const mine=pr;
+    pr.on('open',()=>link(mine));
+    pr.on('disconnected',()=>{try{mine.reconnect()}catch(e){}});
+    pr.on('error',e=>{
+      if(e.type==='peer-unavailable'){if(++tries>4)app.innerHTML='<h1>Room not found</h1><p class="dim">Check the code.</p><button onclick="location.reload()">Back</button>';else{st('Looking for the room…');setTimeout(()=>link(mine),1500)}return}
+      if(e.type==='unavailable-id'){me='jp-'+Math.random().toString(36).slice(2,10);try{sessionStorage.setItem('jpid',me)}catch(x){}try{mine.destroy()}catch(x){}start();return}
+      if(['network','server-error','socket-error','socket-closed'].includes(e.type)){st('Network hiccup, retrying…');try{mine.destroy()}catch(x){}setTimeout(start,1500)}
+    });
+  };
+  const link=p=>{
+    if(p!==pr||p.destroyed)return;
+    const old=pc,c=p.connect('jpardy-'+code,{reliable:true});pc=c;if(old){try{old.close()}catch(e){}}
+    st('Connecting… (try '+(++n)+')');
+    c.on('open',()=>{tries=0;tx(isJ?'judge':'join',{n:myName})});
+    c.on('data',d=>{if(d&&d.ph){pub=d;pub.rcv=Date.now();render()}});
+    c.on('close',()=>{if(pc===c)setTimeout(()=>link(p),1200)});
+    setTimeout(()=>{if(pc===c&&!c.open){st('Still connecting… retrying');link(p)}},6000);
+  };
+  start();
+  setInterval(()=>{if(!pc||!pc.open)return;if(isJ?!(pub&&pub.judge):!(pub&&pub.players&&pub.players[me]))tx(isJ?'judge':'join',{n:myName})},2000);
 }
 function render(){
   if(mode==='judge')return renderJudge();
