@@ -86,17 +86,18 @@ canvas{filter:drop-shadow(0 10px 25px #0008)}
 .mc{font-size:10px;font-weight:600;text-transform:uppercase;background:linear-gradient(#ff7a3f,#ff3fa4);border-radius:8px;padding:6px 2px;display:flex;align-items:center;justify-content:center}
 .mt{padding:14px 0;font-family:'Bungee',sans-serif;font-weight:400;font-size:14px;color:var(--gold);background:linear-gradient(#4a5bff,#2433d6);box-shadow:0 4px 0 #121a85;border-radius:10px}
 .anim .tile,.anim .p{animation:pop .45s backwards}.anim .clue{animation:flip .6s}.anim .bubble{animation:pop .3s}
+.board .tile{font-size:clamp(13px,calc(60vw/var(--n,5)),48px)}.board .cat{font-size:clamp(9px,calc(24vw/var(--n,5)),22px);padding:10px 2px;word-break:break-word}.board{gap:6px}.mb{display:block}.pr{display:flex;gap:6px;align-items:center;margin:6px 0}.pn{flex:1;text-align:left;font-weight:600;font-size:15px}.mt{flex:0 0 64px}
+.pod{display:flex;align-items:flex-end;justify-content:center;gap:14px;margin:20px 0}.pcol{text-align:center;min-width:150px}.pb{border-radius:14px 14px 0 0;font-size:56px;display:flex;align-items:flex-start;justify-content:center;padding-top:10px}.pn2{font-family:'Bungee',sans-serif;font-size:1.3em}.ps{font-family:'Bungee',sans-serif;color:var(--gold);font-size:1.6em;margin-bottom:6px}
 </style></head><body><div class="wrap" id="app"></div>
 <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <script>window.Peer||document.write('<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"><\/script>')</script>
 <script>
-const CATS=[
-["Science",[["This planet is known as the Red Planet","Mars"],["H2O is the chemical formula for this","Water"],["The powerhouse of the cell","Mitochondria"],["This force keeps planets in orbit around the Sun","Gravity"],["Element with atomic number 79","Gold"]]],
-["Geography",[["The longest river in Africa","The Nile"],["Capital of Australia","Canberra"],["The only continent with no permanent residents","Antarctica"],["Tallest mountain above sea level","Mount Everest"],["Country with the most time zones, counting territories","France"]]],
-["Movies",[["Clownfish dad searching for his son","Finding Nemo"],["1997 ship film: 'I'm the king of the world!'","Titanic"],["Wizard student with a lightning scar","Harry Potter"],["Director of Jaws and E.T.","Steven Spielberg"],["Tom Hanks: 'Life is like a box of chocolates'","Forrest Gump"]]],
-["Food",[["Italian dish with tomato sauce and mozzarella","Pizza"],["Japanese dish of vinegared rice and raw fish","Sushi"],["Main ingredient of guacamole","Avocado"],["World's most expensive spice by weight","Saffron"],["Korea's national dish of fermented cabbage","Kimchi"]]],
-["History",[["First U.S. president","George Washington"],["Year the Berlin Wall fell","1989"],["Ancient wonder in Egypt still standing","Great Pyramid of Giza"],["Queen of Egypt allied with Julius Caesar","Cleopatra"],["1919 treaty that ended World War I","Treaty of Versailles"]]]];
-const VAL=[200,400,600,800,1000];
+const dec=b=>new TextDecoder().decode(Uint8Array.from(atob(b),c=>c.charCodeAt(0)));
+const ROUNDS=[
+{n:"Round 1: The Friends",v:[100,300,500],c:[["Sammy",[["What suburb was Sammy born in?","Sammy will provide the answer"],["When did Sammy start growing out their hair?","Sammy will provide the answer"],["What body part did Sammy dislocate?","Sammy will provide the answer"]]],["Lachy",[["What is Lachy’s band’s name? (correct spelling)","Lachy will provide the answer"],["How many men has Lachy kissed?","Lachy will provide the answer"],["How fast can Lachy run 100m, give or take 10 milliseconds?","Lachy will provide the answer"]]],["Abigail",[["What knee does Abigail have a scar on?","Abigail will provide the answer"],["When did Abigail start wearing glasses?","Abigail will provide the answer"],["Where is the only place on Abigail’s body that she has gotten stitches?","Abigail will provide the answer"]]],["Priya",[["What’s Priya’s job?","Priya will provide the answer"],["What’s Priya’s background?","Priya will provide the answer"],["What instrument did Priya play in high school?","Priya will provide the answer"]]],["Anna",[["What is the name, age, gender and breed of Anna’s cat?","Anna will provide the answer"],["What’s Anna’s closest experience to death, the one she had recurring dreams about?","Anna will provide the answer"],["What is Anna’s favourite fruit?","Anna will provide the answer"]]],["Zayn",[["What is Zayn’s main job?","Zayn will provide the answer"],["What was Zayn’s best subject in the HSC?","Zayn will provide the answer"],["When did Zayn first start training martial arts?","Zayn will provide the answer"]]],["Amanda",[["What did Amanda win in the 2022 Maccas Monopoly?","Amanda will provide the answer"],["What is Amanda’s cat’s name?","Amanda will provide the answer"],["What was Amanda’s old phone case?","Amanda will provide the answer"]]],["Serena",[["According to Serena, who has the most high-maintenance beauty routine in the group?","Serena will provide the answer"],["Does Serena have a favourite sport? If yes, what is it?","Serena will provide the answer"],["What’s Serena’s ultimate pet peeve?","Serena will provide the answer"]]],["Jennisa",[["What was the first language Jennisa learned to speak?","Jennisa will provide the answer"],["How many official relationships has Jennisa been in, including her current one?","Jennisa will provide the answer"],["What’s the most MDMA Jennisa has taken in one night?","Jennisa will provide the answer"]]],["Ryan",[["What’s Ryan’s go-to takeaway order?","Ryan will provide the answer"],["What’s Ryan’s biggest irrational fear?","Ryan will provide the answer"],["Name one of the 3 words Ryan used to describe himself in primary school.","Ryan will provide the answer"]]],["Ethan",[["What was Ethan’s old role in SUDATA?","Ethan will provide the answer"],["What’s the name of Ethan’s girlfriend?","Ethan will provide the answer"],["What’s Ethan’s favourite kink?","Ethan will provide the answer"]]]]},
+{n:"Round 2: Trivia",v:[200,400,600,800],c:[["NY Times Connections",[["Name the word that connects: Butter • Dragon • Fire",dec("Rmx5")],["Name the word that connects: Gold • Sword • Cat",dec("RmlzaA==")],["Name the word that connects: Time • Air • Sky",dec("TGluZQ==")],["Name the word that connects: Mother • Key • Dash",dec("Qm9hcmQ=")]]],["Freud Around & Find Out 🧠",[["Which Russian scientist trained dogs to salivate at the sound of a bell?",dec("SXZhbiBQYXZsb3Y=")],["What is the name for people being less likely to help in an emergency when others are around?",dec("VGhlIGJ5c3RhbmRlciBlZmZlY3Q=")],["Which cognitive bias has unskilled people overestimating their own ability?",dec("VGhlIER1bm5pbmfigJNLcnVnZXIgZWZmZWN0")],["Which psychologist led the 1971 Stanford Prison Experiment?",dec("UGhpbGlwIFppbWJhcmRv")]]],["Group Chat Lore",[["This person types “lol” more than anyone else in the chat, by a huge margin.",dec("QWJpZ2FpbA==")],["Hundreds of emojis deep: this person is the chat’s biggest emoji user.",dec("QW5uYQ==")],["This quiet one has sent the fewest messages of anyone in the group.",dec("UHJpeWE=")],["This person hands out the most reactions on other people’s messages, over 300 of them.",dec("WmF5bg==")]]],["More Chat Trivia",[["This person created the group chat back in December 2025.",dec("dHA=")],["This person named the group “Pass the knife”.",dec("TGFjaHk=")],["This person sends the most reels and attachments, about double anyone else.",dec("Unlhbg==")],["This is the only person who ever types “lwk”.",dec("S2ltY2hlZQ==")]]],["General Knowledge",[["What is the capital city of Australia?",dec("Q2FuYmVycmE=")],["Who painted The Starry Night?",dec("VmluY2VudCB2YW4gR29naA==")],["In what year did the first iPhone launch?",dec("MjAwNw==")],["What is the smallest country in the world by area?",dec("VmF0aWNhbiBDaXR5")]]]]}
+];
+const CR=()=>ROUNDS[((mode==='host'&&S)?S.round:(pub&&pub.rd))||0],NC=()=>CR().c.length,NR=()=>CR().v.length,tot=()=>NC()*NR();
 const TEAMS=[["Red","#e53935"],["Blue","#1e88e5"],["Green","#43a047"],["Purple","#8e24aa"],["Orange","#fb8c00"],["Teal","#00acc1"]];
 const A=i=>document.getElementById(i),app=A('app');
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -105,15 +106,16 @@ let me;try{me=sessionStorage.getItem('jpid');if(!me){me='jp-'+Math.random().toSt
 let mode=null,S=null,hp=null,pc=null,pub=null,myName='',sent='',wr=0,prevS=null,wasPk=false;const conns={};
 
 function home(){
-  mode=null;const pre=(new URLSearchParams(location.search).get('c')||'').slice(0,4);
+  mode=null;let sv={};try{sv=JSON.parse(localStorage.getItem('jpj')||'{}')}catch(e){}
+  const pre=(new URLSearchParams(location.search).get('c')||(sv.t&&Date.now()-sv.t<216e5?sv.c:'')||'').slice(0,4);
   app.innerHTML=`<h1>JEOPARDY NIGHT</h1><p class="dim">Show the board on the TV. Everyone plays on their phone.</p>
   <div class="row"><button id="h">📺 Host on TV</button></div><hr style="opacity:.2;margin:24px 0">
   <div style="max-width:320px;margin:auto"><input id="c" placeholder="Room code" maxlength="4" value="${esc(pre)}">
-  <input id="n" placeholder="Your name" maxlength="12"><button id="j" style="width:100%">Join as player</button>
+  <input id="n" placeholder="Your name" maxlength="12" value="${esc(sv.n||'')}"><button id="j" style="width:100%">Join as player</button>
   <p><button id="jd" class="sec sm">I'm the judge (host's phone)</button></p></div>`;
   const code=()=>A('c').value.trim().toLowerCase();
   A('h').onclick=host;
-  A('j').onclick=()=>{const n=A('n').value.trim();if(code().length==4&&n)play(code(),n,false)};
+  A('j').onclick=()=>{const n=A('n').value.trim();if(code().length==4&&n){try{localStorage.setItem('jpj',JSON.stringify({c:code(),n,t:Date.now()}))}catch(e){}play(code(),n,false)}};
   A('jd').onclick=()=>{if(code().length==4)play(code(),'Judge',true)};
 }
 /* ---------- HOST (TV) ---------- */
@@ -121,7 +123,7 @@ function noPeer(){app.innerHTML='<h1>Can\'t connect 😕</h1><p>The multiplayer 
 function host(){if(typeof Peer==='undefined')return noPeer();mode='host';mk();setInterval(send,3000)}
 function mk(){
   const code=Array.from({length:4},()=>'abcdefghjkmnpqrstuvwxyz'[Math.random()*23|0]).join('');
-  S={code,ph:'lobby',nt:2,players:{},teams:[],used:[],cur:null,who:null,txt:'',lock:[],picker:null,judge:null,lj:false,bt:20,td:0,tEnd:null,tn:TEAMS.map((t,i)=>'Team '+(i+1))};
+  S={code,ph:'lobby',nt:2,players:{},teams:[],used:[],cur:null,who:null,txt:'',lock:[],picker:null,judge:null,lj:false,round:0,pfu:[],paused:false,cs:0,bt:20,td:0,tEnd:null,tn:TEAMS.map((t,i)=>'Team '+(i+1))};
   const pr=new Peer('jpardy-'+code);hp=pr;
   pr.on('error',e=>{if(e.type==='unavailable-id'){pr.destroy();mk()}else app.innerHTML='<h1>Connection error</h1><p>'+esc(e.type)+'</p>'});
   pr.on('open',draw);
@@ -131,36 +133,55 @@ function smallest(){const n=S.teams.map(()=>0);Object.values(S.players).forEach(
 function onMsg(id,d){
   if(!d||typeof d!=='object')return;
   const P=S.players[id];
-  if(d.t==='join'&&d.n){if(!P)S.players[id]={n:String(d.n).slice(0,12),e:EM[Math.random()*EM.length|0],t:S.teams.length&&S.ph!=='spin'?smallest():null};send();draw()}
-  else if(d.t==='pick'){if(S.ph==='board'&&id===S.pk&&Number.isInteger(d.c)&&Number.isInteger(d.r)&&d.c>=0&&d.c<5&&d.r>=0&&d.r<5&&!S.used.includes(d.c*5+d.r))pick(d.c,d.r)}
+  if(d.t==='join'&&d.n){
+    const nm=String(d.n).slice(0,12);
+    if(!P){
+      const old=Object.keys(S.players).find(k=>!S.players[k].bot&&S.players[k].n.toLowerCase()===nm.toLowerCase());
+      if(old){
+        const np={};Object.keys(S.players).forEach(k=>{np[k===old?id:k]=S.players[k]});S.players=np;
+        if(S.who===old)S.who=id;if(S.pk===old)S.pk=id;
+        if(conns[old]){const oc=conns[old];delete conns[old];try{oc.close()}catch(e){}}
+      } else S.players[id]={n:nm,e:EM[Math.random()*EM.length|0],t:S.teams.length&&S.ph!=='spin'?smallest():null};
+    }
+    send();draw()}
+  else if(d.t==='pf'){if(S.ph==='ans'&&id===S.who&&!S.txt&&!S.paused&&P&&!S.pfu[P.t]&&S.tEnd){S.pfu[P.t]=1;S.pause=Math.max(0,S.tEnd-Date.now());S.tEnd=null;S.paused=true;send();draw()}}
+  else if(d.t==='resume'&&(id===S.who||id===S.judge))resume();
+  else if(d.t==='skiprd'&&id===S.judge)doSkip();
+  else if(d.t==='pick'){if(S.ph==='board'&&id===S.pk&&Number.isInteger(d.c)&&Number.isInteger(d.r)&&d.c>=0&&d.c<NC()&&d.r>=0&&d.r<NR()&&!S.used.includes(d.c*NR()+d.r))pick(d.c,d.r)}
   else if(d.t==='tname'){if(S.ph!=='lobby'||!P||P.t==null||capOf(P.t)!==id)return;const v=String(d.x||'').trim().slice(0,14);if(!v)return;S.tn[P.t]=v;if(S.teams[P.t])S.teams[P.t].n=v;send();draw()}
   else if(d.t==='judge'){S.judge=id;send();draw()}
   else if(d.t==='buzz'){if(S.ph!=='buzz'||!P||P.t==null||S.lock.includes(P.t))return;S.who=id;S.ph='ans';S.txt='';setT(15);send();draw()}
-  else if(d.t==='answer'){if(S.ph!=='ans'||id!==S.who||S.txt)return;S.txt=String(d.x||'(no answer)').slice(0,80);S.tEnd=null;send();draw()}
+  else if(d.t==='answer'){if(S.ph!=='ans'||id!==S.who||S.txt)return;S.txt=String(d.x||'(no answer)').slice(0,80);S.tEnd=null;S.paused=false;send();draw()}
   else if(id===S.judge&&d.t==='adj')adj(d.i,d.v);
   else if(id===S.judge&&['ok','no','skip','next'].includes(d.t))act(d.t);
 }
 function act(a){
-  if(!S.cur)return;const v=VAL[S.cur[1]],P=S.players[S.who];
+  if(!S.cur)return;const v=CR().v[S.cur[1]],P=S.players[S.who];
   if(a==='ok'&&S.ph==='ans'){S.teams[P.t].s+=v;S.picker=P.t;S.pk=S.who;S.ph='rev'}
   else if(a==='no'&&S.ph==='ans'){S.teams[P.t].s-=v;S.lock.push(P.t);S.who=null;S.txt='';S.ph=S.teams.every((_,i)=>S.lock.includes(i))?'rev':'buzz'}
   else if(a==='skip'&&S.ph==='buzz')S.ph='rev';
   else if(a==='next'&&S.ph==='rev'){S.ph='board';S.cur=null}
   else return;
+  S.paused=false;
   if(S.ph==='buzz')setT(S.bt);else if(S.ph!=='ans')S.tEnd=null;
   if(a==='ok'){S.res='🎉 '+P.n+' ('+S.teams[P.t].n+') got it! +$'+v;S.rok=1}else if(S.ph==='rev'){S.res='😬 Nobody got it!';S.rok=0}
   if(a==='ok'){fx('🎉 CORRECT! +$'+v,'ok');confetti()}else if(a==='no')fx('✘ WRONG −$'+v,'bad');
   send();draw();
 }
 function send(){
-  if(!hp)return;const c=S.cur?CATS[S.cur[0]]:null,cl=c?c[1][S.cur[1]]:null;
-  const d={ph:S.ph,players:S.players,teams:S.teams,who:S.who,lock:S.lock,txt:S.txt,picker:S.picker,clue:cl?cl[0]:'',cat:c?c[0]:'',val:cl?VAL[S.cur[1]]:0,ans:S.ph==='rev'&&cl?cl[1]:'',done:S.used.length>=25,pk:S.pk,used:S.used,caps:S.teams.map((_,i)=>capOf(i)||null),tl:S.tEnd?Math.max(0,S.tEnd-Date.now()):0,td:S.td};
+  if(!hp)return;const c=S.cur?CR().c[S.cur[0]]:null,cl=c?c[1][S.cur[1]]:null;
+  const d={ph:S.ph,players:S.players,teams:S.teams,who:S.who,lock:S.lock,txt:S.txt,picker:S.picker,clue:cl?cl[0]:'',cat:c?c[0]:'',val:cl?CR().v[S.cur[1]]:0,ans:S.ph==='rev'&&cl?cl[1]:'',done:S.used.length>=tot(),fin:S.round===ROUNDS.length-1,rd:S.round,pfu:S.pfu,pz:S.paused,pk:S.pk,used:S.used,caps:S.teams.map((_,i)=>capOf(i)||null),tl:S.tEnd?Math.max(0,S.tEnd-Date.now()):0,td:S.td};
   Object.values(conns).forEach(k=>{if(k.open)k.send(k.peer===S.judge?Object.assign({},d,{judge:1,ja:cl?cl[1]:''}):d)});
 }
 
 const EM=['🦊','🐼','🐸','🦄','🐙','🐯','🦁','🐵','🐧','🐲','🦖','🐝','🐨','🦉'];
 const TH='<div class="tbar"><i id="tb"></i></div><div id="tt" class="tt"></div>';
 function capOf(i){return Object.keys(S.players).find(id=>S.players[id].t===i&&!S.players[id].bot)}
+function nextRound(){S.round++;S.used=[];S.cf=0;S.bk={};S.cur=null;const lo=Math.min(...S.teams.map(t=>t.s)),low=S.teams.map((t,i)=>t.s===lo?i:-1).filter(i=>i>=0),ti=low[Math.random()*low.length|0],mem=Object.keys(S.players).filter(id=>S.players[id].t===ti);if(mem.length){S.pk=mem[Math.random()*mem.length|0];S.picker=ti}S.ph='board';send();draw()}
+function resume(){if(!S.paused)return;S.paused=false;S.tEnd=Date.now()+S.pause;send();draw()}
+function doSkip(){S.cs=0;if(S.ph!=='board')return;S.used=Array.from({length:tot()},(_,i)=>i);S.cur=null;send();draw()}
+function skipUi(){const f=S.round===ROUNDS.length-1;return S.cs?`<div class="ban x" style="font-size:clamp(18px,3vw,32px)">${f?'Skip to the podium?':'Skip the rest of Round '+(S.round+1)+'?'} This can't be undone.<div class="row"><button class="bad" id="cy">Yes, skip</button><button class="sec" id="cn">Cancel</button></div></div>`:`<div class="row"><button class="sec sm" id="sk0">${f?'🏁 Skip to podium':'⏭ Skip round '+(S.round+1)}</button></div>`}
+function podium(){const o=S.teams.slice().sort((a,b)=>b.s-a.s),ord=[1,0,2].filter(i=>o[i]),H=[200,150,110];return '<div class="pod">'+ord.map(i=>`<div class="pcol"><div class="pn2" style="color:${o[i].c}">${esc(o[i].n)}</div><div class="ps">${$$(o[i].s)}</div><div class="pb" style="height:${H[i]}px;background:${o[i].c}">${['🥇','🥈','🥉'][i]}</div></div>`).join('')+'</div>'+(o.length>3?'<p class="dim">'+o.slice(3).map(t=>esc(t.n)+' '+$$(t.s)).join(' · ')+'</p>':'')}
 function setT(n){S.tEnd=Date.now()+n*1000;S.td=n}
 function adj(i,v){if(S.teams[i]&&Math.abs(v)===100){S.teams[i].s+=v;send();draw()}}
 function fx(t,k){const e=document.createElement('div');e.className='toast '+k;e.textContent=t;document.body.appendChild(e);setTimeout(()=>e.remove(),1800)}
@@ -180,17 +201,17 @@ function addBot(){
 }
 function botsAct(){
   S.bk=S.bk||{};const L=S.used.length+'-'+S.lock.length;
-  if(S.ph==='board'&&S.players[S.pk]&&S.players[S.pk].bot&&S.used.length<25){const k='p'+S.used.length;if(!S.bk[k]){S.bk[k]=1;setTimeout(()=>{if(S.ph!=='board')return;const fr=[];for(let i=0;i<25;i++)if(!S.used.includes(i))fr.push(i);if(fr.length){const f=fr[Math.random()*fr.length|0];pick(f/5|0,f%5)}},1800)}}
+  if(S.ph==='board'&&S.players[S.pk]&&S.players[S.pk].bot&&S.used.length<tot()){const k='p'+S.used.length;if(!S.bk[k]){S.bk[k]=1;setTimeout(()=>{if(S.ph!=='board')return;const fr=[];for(let i=0;i<tot();i++)if(!S.used.includes(i))fr.push(i);if(fr.length){const f=fr[Math.random()*fr.length|0];pick(f/NR()|0,f%NR())}},3200)}}
   if(S.ph==='buzz'){
     Object.keys(S.players).forEach(id=>{const p=S.players[id],k='b'+L+id;
       if(!p.bot||S.bk[k]||p.t==null||S.lock.includes(p.t))return;S.bk[k]=1;
-      if(Math.random()<.7)setTimeout(()=>{if(S.ph==='buzz')onMsg(id,{t:'buzz'})},1000+Math.random()*3500)});
+      if(Math.random()<.7)setTimeout(()=>{if(S.ph==='buzz')onMsg(id,{t:'buzz'})},2200+Math.random()*4000)});
   } else if(S.ph==='ans'&&S.players[S.who]&&S.players[S.who].bot){
     const id=S.who,k='a'+L+id;if(S.bk[k])return;S.bk[k]=1;
-    setTimeout(()=>{if(S.ph==='ans'&&S.who===id&&!S.txt)onMsg(id,{t:'answer',x:Math.random()<.5?CATS[S.cur[0]][1][S.cur[1]][1]:'Not sure, a guess'})},1500+Math.random()*2000);
+    setTimeout(()=>{if(S.ph==='ans'&&S.who===id&&!S.txt)onMsg(id,{t:'answer',x:Math.random()<.5?CR().c[S.cur[0]][1][S.cur[1]][1]:'Not sure, a guess'})},3000+Math.random()*3000);
   }
 }
-function pick(c,r){if(S.ph!=='board')return;S.cur=[c,r];S.used.push(c*5+r);S.lock=[];S.who=null;S.txt='';S.ph='buzz';setT(S.bt);send();draw()}
+function pick(c,r){if(S.ph!=='board')return;S.cur=[c,r];S.used.push(c*NR()+r);S.lock=[];S.who=null;S.txt='';S.ph='buzz';setT(S.bt);send();draw()}
 function roster(){
   const ps=Object.values(S.players);
   if(!S.teams.length)return '<div class="pl">'+(ps.map(p=>`<div class="p">${p.e||''} ${esc(p.n)}</div>`).join('')||'<p class="dim">Waiting for players…</p>')+'</div>';
@@ -210,7 +231,7 @@ function jl(){return S.lj?'<p class="dim">Judging on this screen (answer shows a
 const PAL=['#ff3fa4','#2b8cff','#2ecc71','#ff9f1c','#9b5de5','#00bbf9','#f15bb5','#e6c200','#00c9a7','#ff595e'];
 async function spin(){
   S.teams=TEAMS.slice(0,S.nt).map(([n,c],i)=>({n:S.tn[i],c,s:0}));
-  const ids=Object.keys(S.players);ids.forEach(i=>S.players[i].t=null);S.ph='spin';send();
+  const ids=Object.keys(S.players);ids.forEach(i=>S.players[i].t=null);S.ph='spin';S.pfu=[];send();
   let pool=ids.slice();const n=ids.length,base=Math.floor(n/S.nt),extra=n%S.nt;
   for(let t=0;t<S.nt;t++){
     const q=base+(t<extra?1:0);
@@ -249,18 +270,19 @@ function draw(){
     app.querySelectorAll('.nt').forEach(b=>b.onclick=()=>{S.nt=+b.dataset.n;S.teams=[];ids.forEach(i=>S.players[i].t=null);send();draw()});
     A('sp').onclick=spin;app.querySelectorAll('.bt').forEach(b=>b.onclick=()=>{S.bt=+b.dataset.n;draw()});A('ab').onclick=addBot;if(A('rb'))A('rb').onclick=()=>{ids.forEach(i=>{if(S.players[i].bot)delete S.players[i]});send();draw()};if(A('go'))A('go').onclick=()=>{S.ph='board';if(S.pk==null||!S.players[S.pk]){const ks=Object.keys(S.players);S.pk=ks[Math.random()*ks.length|0];S.picker=S.players[S.pk].t}send();draw()};
   } else if(S.ph==='board'){
-    const over=S.used.length>=25,top=S.teams.reduce((m,t)=>t.s>m.s?t:m,S.teams[0]);if(over&&!S.cf){S.cf=1;confetti()}
-    let t=CATS.map(c=>`<div class="cat">${esc(c[0])}</div>`).join('');
-    for(let r=0;r<5;r++)for(let c=0;c<5;c++)t+=`<button class="tile ${S.used.includes(c*5+r)?'used':''}" data-c="${c}" data-r="${r}">$${VAL[r]}</button>`;
-    app.innerHTML=`${over?'':banner()}<div class="board">${t}</div>${over?`<h1>🏆 ${esc(top.n)} wins!</h1>`:''}${scores(S.picker)}${jl()}`;
-    app.querySelectorAll('.tile').forEach(b=>b.onclick=()=>pick(+b.dataset.c,+b.dataset.r));
+    const over=S.used.length>=tot(),fin=S.round===ROUNDS.length-1,top=S.teams.reduce((m,t)=>t.s>m.s?t:m,S.teams[0]);if(over&&!S.cf){S.cf=1;confetti()}
+    const N=NC();let t=CR().c.map(c=>`<div class="cat">${esc(c[0])}</div>`).join('');
+    for(let r=0;r<NR();r++)for(let c=0;c<N;c++)t+=`<button class="tile ${S.used.includes(c*NR()+r)?'used':''}" data-c="${c}" data-r="${r}">$${CR().v[r]}</button>`;
+    app.innerHTML=over?`<h1>${fin?'🏆 '+esc(top.n)+' wins!':'🎉 Round '+(S.round+1)+' complete!'}</h1>${fin?podium():scores(null)}${fin?'':`<div class="row"><button id="r2">Start Round ${S.round+2} ▶</button></div><p class="dim">The team in last place picks first</p>`}`:`<p class="dim" style="margin:0;letter-spacing:2px;text-transform:uppercase">${esc(CR().n)}</p>${banner()}<div class="board" style="grid-template-columns:repeat(${N},1fr);--n:${N}">${t}</div>${scores(S.picker)}${jl()}${skipUi()}`;
+    app.querySelectorAll('.tile').forEach(b=>b.onclick=()=>pick(+b.dataset.c,+b.dataset.r));if(A('r2'))A('r2').onclick=nextRound;if(A('sk0'))A('sk0').onclick=()=>{S.cs=1;draw();setTimeout(()=>{if(S.cs){S.cs=0;draw()}},8000)};if(A('cy'))A('cy').onclick=doSkip;if(A('cn'))A('cn').onclick=()=>{S.cs=0;draw()};
   } else {
-    const c=CATS[S.cur[0]],cl=c[1][S.cur[1]],pl=S.players[S.who],tm=pl&&S.teams[pl.t];let b='';
+    const c=CR().c[S.cur[0]],cl=c[1][S.cur[1]],pl=S.players[S.who],tm=pl&&S.teams[pl.t];let b='';
     if(S.ph==='buzz')b='<div class="ban b">🔔 BUZZ IN NOW!<small>tap the big red button on your phone</small></div>'+(S.lj?`<div class="row"><button class="sec" id="sk">Skip</button></div>`:'');
     if(S.ph==='ans')b=`<div class="spot" style="--c:${tm.c}"><div class="av">${pl.e||'🙋'}</div><div><div class="who2">${esc(pl.n)}</div><div class="of">${esc(tm.n)} is answering…</div></div></div><div class="bubble">${S.txt?'“'+esc(S.txt)+'”':'<span class="dim">✍️ typing…</span>'}</div>`+(S.lj?`${S.txt?`<p class="dim">Answer: ${esc(cl[1])}</p>`:'<p class="dim">Answer shows once they submit…</p>'}<div class="row"><button class="ok" id="ok">✔ Correct</button><button class="bad" id="no">✘ Wrong</button></div>`:'<p class="dim">Waiting for the judge…</p>');
+    if(S.ph==='ans'&&S.paused)b='<div class="ban b">📞 PHONING A FRIEND<small>Timer paused</small></div>'+b+'<div class="row"><button class="ok" id="pfr">▶ Resume timer</button></div>';
     if(S.ph==='rev')b=`<div class="ban ${S.rok?'g':'x'}">${esc(S.res||'')}</div><div class="ansbig">✅ ${esc(cl[1])}</div><div class="row"><button id="nx">Back to board</button></div>`;
-    app.innerHTML=`<p class="dim" style="text-transform:uppercase">${esc(c[0])} — $${VAL[S.cur[1]]}</p><div class="clue">${esc(cl[0])}</div>${S.tEnd?TH:''}${b}${scores(tm?S.players[S.who].t:null)}${S.ph==='buzz'||S.ph==='ans'?jl():''}`;
-    [['sk','skip'],['ok','ok'],['no','no'],['nx','next']].forEach(([i,a])=>{if(A(i))A(i).onclick=()=>act(a)});
+    app.innerHTML=`<p class="dim" style="text-transform:uppercase">${esc(c[0])} — $${CR().v[S.cur[1]]}</p><div class="clue">${esc(cl[0])}</div>${S.tEnd?TH:''}${b}${scores(tm?S.players[S.who].t:null)}${S.ph==='buzz'||S.ph==='ans'?jl():''}`;
+    [['sk','skip'],['ok','ok'],['no','no'],['nx','next']].forEach(([i,a])=>{if(A(i))A(i).onclick=()=>act(a)});if(A('pfr'))A('pfr').onclick=resume;
   }
   if(A('lj'))A('lj').onclick=()=>{S.lj=true;draw()};
   app.querySelectorAll('[data-adj]').forEach(b=>b.onclick=()=>{const[i,v]=b.dataset.adj.split(':');adj(+i,+v)});
@@ -277,6 +299,7 @@ function play(code,name,isJ){
     pc.on('data',d=>{if(d&&d.ph){pub=d;pub.rcv=Date.now();render()}});
     pc.on('close',()=>setTimeout(link,2000))};
   pr.on('open',link);
+  pr.on('disconnected',()=>{try{pr.reconnect()}catch(e){}});
   pr.on('error',e=>{if(e.type==='peer-unavailable')app.innerHTML='<h1>Room not found</h1><p class="dim">Check the code.</p><button onclick="location.reload()">Back</button>'});
   setInterval(()=>{if(!pc||!pc.open)return;if(isJ?!(pub&&pub.judge):!(pub&&pub.players&&pub.players[me]))tx(isJ?'judge':'join',{n:myName})},2500);
   render();
@@ -296,10 +319,10 @@ function render(){
   if(pub.ph==='lobby')b=tm?`<h2>You're on <span style="color:${tm.c}">${esc(tm.n)}</span>! 🎉</h2>`+(isCap?`<p>👑 You're the captain — name your team!</p><input id="tnm" maxlength="14" value="${esc(tm.n)}"><button id="tns" style="width:100%">Save team name</button>`:`<p class="dim">${capName} is captain and picks the team name</p>`)+'<p class="dim">Waiting for the host to start…</p>':'<h2>You\'re in! 🎉</h2><p class="dim">Waiting for the team wheel…</p>';
   else if(pub.ph==='spin')b='<h2>🎡 Spinning the wheel…</h2>'+(tm?`<p>You\'re on <span style="color:${tm.c}">${esc(tm.n)}</span>!</p>`:'<p class="dim">Watch the TV — your name is on the wheel!</p>');
   else if(pub.ph==='board'){
-    if(pub.done)b='<h2>Game over! 🏆</h2>';
+    if(pub.done)b=pub.fin?'<h2>Game over! 🏆</h2>':'<h2>🎉 Round complete!</h2><p class="dim">Watch the TV for the scores</p>';
     else if(pub.pk===me){
       if(!wasPk&&navigator.vibrate)navigator.vibrate([120,60,120]);wasPk=true;
-      b='<div class="ban pk">🎯 IT\'S YOUR PICK!<small>choose a clue below</small></div><div class="mb">'+CATS.map(c=>`<div class="mc">${esc(c[0])}</div>`).join('')+VAL.map((v,r)=>CATS.map((_,c)=>`<button class="mt" data-c="${c}" data-r="${r}" ${pub.used.includes(c*5+r)?'disabled style="visibility:hidden"':''}>${v}</button>`).join('')).join('')+'</div>';
+      b='<div class="ban pk">🎯 IT\'S YOUR PICK!<small>choose a clue below</small></div><div class="mb">'+CR().c.map((cat,c)=>`<div class="pr"><div class="pn">${esc(cat[0])}</div>${CR().v.map((v,r)=>`<button class="mt" data-c="${c}" data-r="${r}" ${pub.used.includes(c*NR()+r)?'disabled style="visibility:hidden"':''}>${v}</button>`).join('')}</div>`).join('')+'</div>';
     } else {
       wasPk=false;const pk=pub.players[pub.pk],pt=pk&&pk.t!=null?pub.teams[pk.t]:null;
       b=`<div class="ban wait">⏳ Not your pick</div><h2>${pk?(pk.e||'')+' '+esc(pk.n):'Someone'} is choosing the clue</h2>`+(pk&&pk.t===mp.t?'<p>Your teammate is picking — shout out ideas! 🗣️</p>':pt?`<p class="dim">${esc(pt.n)} is up</p>`:'');
@@ -312,7 +335,7 @@ function render(){
   } else if(pub.ph==='ans'){
     const txt=pub.txt||sent;
     if(pub.who===me&&txt)b=`<h2>Answer submitted ✔</h2><p class="sub">“${esc(txt)}”</p><p class="dim">Locked in — waiting for the judge…</p>`;
-    else if(pub.who===me)b=`<h2>You buzzed in! ✋</h2>${pub.tl?TH:''}<input id="at" placeholder="Type your answer" autocomplete="off"><button id="as" style="width:100%">Submit</button>`;
+    else if(pub.who===me)b=pub.pz?'<h2>📞 Phoning a friend…</h2><p class="dim">Timer paused</p><button class="ok" id="pfr" style="width:100%">▶ I\'m back — resume timer</button>':`<h2>You buzzed in! ✋</h2>${pub.tl?TH:''}<input id="at" placeholder="Type your answer" autocomplete="off"><button id="as" style="width:100%">Submit</button>`+(pub.pfu&&pub.pfu[mp.t]?'<p class="dim">📞 Your team has used its phone-a-friend</p>':'<button class="sec" id="pf" style="width:100%;margin-top:12px">📞 Phone a friend (1 per team)</button>');
     else{const w=pub.players[pub.who];b=`<h2>${esc(w?w.n:'Someone')} buzzed in</h2><p class="dim">Waiting for their answer…</p>`}
   } else if(pub.ph==='rev')b=`<h2>Answer</h2><p style="font-size:1.6em;color:var(--gold)">${esc(pub.ans)}</p>`;
   const keep=A('at')&&A('at').value;
@@ -320,6 +343,7 @@ function render(){
   if(A('bz'))A('bz').onclick=()=>{tx('buzz',{});if(navigator.vibrate)navigator.vibrate(60);A('bz').disabled=true;A('bz').textContent='…'};
   if(A('tns')){const ti=A('tnm'),sv=()=>{const v=ti.value.trim();if(!v)return;tx('tname',{x:v});A('tns').textContent='Saved ✔'};A('tns').onclick=sv;ti.onkeydown=e=>{if(e.key==='Enter')sv()}}
   app.querySelectorAll('.mt').forEach(x=>x.onclick=()=>{tx('pick',{c:+x.dataset.c,r:+x.dataset.r});x.disabled=true});
+  if(A('pf'))A('pf').onclick=()=>tx('pf');if(A('pfr'))A('pfr').onclick=()=>tx('resume');
   const at=A('at');
   if(at){if(keep)at.value=keep;at.focus();
     const go=()=>{const v=at.value.trim();if(!v)return;sent=v;tx('answer',{x:v});render()};
@@ -329,15 +353,18 @@ function renderJudge(){
   if(!pub||!pub.judge){app.innerHTML='<h1>🧑‍⚖️ Judge</h1><p class="dim">Connecting…</p>';return}
   const w=pub.players[pub.who],tm=w&&pub.teams[w.t];let b='';
   if(pub.ph==='lobby'||pub.ph==='spin')b='<p class="dim">Waiting for the game to start…</p>';
-  else if(pub.ph==='board')b='<p class="dim">Waiting for a clue to be picked on the TV…</p>';
+  else if(pub.ph==='board')b='<p class="dim">Waiting for a clue to be picked on the TV…</p>'+(pub.done?'':'<button class="sec sm" id="jskr">'+(pub.fin?'🏁 Skip to podium…':'⏭ Skip this round…')+'</button>');
   else{
     b=`<p class="dim">${esc(pub.cat)} · $${pub.val}</p><p style="font-size:1.2em">${esc(pub.clue)}</p>${pub.tl?TH:''}<p class="sub" style="color:var(--gold)">Answer: ${esc(pub.ja)}</p>`;
     if(pub.ph==='buzz')b+='<p class="dim">Buzzers open…</p><button class="sec" id="jsk" style="width:100%">Skip clue</button>';
     if(pub.ph==='ans')b+=`<h3>${esc(w.n)} (${esc(tm.n)})</h3><p class="sub">${pub.txt?'“'+esc(pub.txt)+'”':'<span class="dim">typing…</span>'}</p><div class="row"><button class="ok" id="jok">✔ Correct</button><button class="bad" id="jno">✘ Wrong</button></div>`;
     if(pub.ph==='rev')b+='<button id="jnx" style="width:100%">Back to board</button>';
   }
+  if(pub.pz)b+='<p class="sub">📞 Phoning a friend — timer paused</p><button id="jres" style="width:100%">▶ Resume timer</button>';
   const adjH=pub.teams.length?'<h3>Adjust scores</h3>'+pub.teams.map((t,i)=>`<div class="adj" style="border-color:${t.c}"><span>${esc(t.n)} <b>${$$(t.s)}</b></span><span><button class="bad sm" data-i="${i}" data-v="-100">−100</button> <button class="ok sm" data-i="${i}" data-v="100">+100</button></span></div>`).join(''):'';
   app.innerHTML='<h2>🧑‍⚖️ Judge screen</h2>'+b+adjH;
+  if(A('jres'))A('jres').onclick=()=>tx('resume');
+  if(A('jskr'))A('jskr').onclick=()=>{if(confirm(pub.fin?'Skip to the podium? This cannot be undone.':'Skip the rest of this round? This cannot be undone.'))tx('skiprd')};
   app.querySelectorAll('.adj button').forEach(x=>x.onclick=()=>tx('adj',{i:+x.dataset.i,v:+x.dataset.v}));
   [['jsk','skip'],['jok','ok'],['jno','no'],['jnx','next']].forEach(([i,a])=>{if(A(i))A(i).onclick=()=>tx(a)});
 }
